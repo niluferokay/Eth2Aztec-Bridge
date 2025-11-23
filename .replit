@@ -37,3 +37,8 @@ author = "agent"
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
+
+[userenv]
+
+[userenv.shared]
+SEPOLIA_RPC_URL = "https://sepolia.infura.io/v3/4782b2faae3549b28ef626f52974cea4"
