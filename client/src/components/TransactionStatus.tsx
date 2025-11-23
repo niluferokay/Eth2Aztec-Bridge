@@ -60,20 +60,23 @@ export default function TransactionStatus({
                 1000 tUSDC has been sent to your wallet
               </p>
               {txHash && (
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge variant="secondary" className="font-mono text-xs">
-                    {truncateTxHash(txHash)}
-                  </Badge>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs text-muted-foreground">Transaction:</span>
+                    <Badge variant="secondary" className="font-mono text-xs">
+                      {truncateTxHash(txHash)}
+                    </Badge>
+                  </div>
                   {explorerUrl && (
                     <a
                       href={`${explorerUrl}/tx/${txHash}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                      className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-primary/10 hover:bg-primary/20 text-primary font-medium text-sm transition-colors"
                       data-testid="link-explorer"
                     >
-                      View on Explorer
-                      <ExternalLink className="h-3 w-3" />
+                      <ExternalLink className="h-4 w-4" />
+                      View on Etherscan
                     </a>
                   )}
                 </div>

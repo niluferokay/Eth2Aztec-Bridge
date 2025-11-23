@@ -80,13 +80,17 @@ export default function Home() {
 
     try {
       // TODO: Replace with actual contract interaction
-      // Simulate transaction
+      // For now, this is a mock transaction for UI demonstration
+      // The transaction hash below is randomly generated and won't exist on Etherscan
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Simulate success
       const mockTxHash = "0x" + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join("");
       setTxHash(mockTxHash);
       setTxStatus("success");
+      
+      console.log("Mock transaction hash:", mockTxHash);
+      console.log("Explorer link:", `${EXPLORER_URL}/tx/${mockTxHash}`);
 
       // Set rate limit
       const lastRequestKey = `faucet_last_request_${address.toLowerCase()}`;
