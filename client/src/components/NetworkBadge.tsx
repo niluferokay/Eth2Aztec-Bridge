@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, CheckCircle } from "lucide-react";
+import { AlertCircle, CheckCircle, Circle } from "lucide-react";
 
 interface NetworkBadgeProps {
   chainId?: number;
@@ -14,7 +14,7 @@ export default function NetworkBadge({ chainId, expectedChainId, networkName }: 
   if (!isConnected) {
     return (
       <Badge variant="secondary" className="gap-2" data-testid="badge-network-disconnected">
-        <div className="h-2 w-2 rounded-full bg-muted-foreground" />
+        <Circle className="h-2 w-2 fill-muted-foreground" />
         Not Connected
       </Badge>
     );
@@ -30,7 +30,7 @@ export default function NetworkBadge({ chainId, expectedChainId, networkName }: 
   }
 
   return (
-    <Badge variant="default" className="gap-2 bg-green-600 hover:bg-green-700" data-testid="badge-network-correct">
+    <Badge className="gap-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 border-0" data-testid="badge-network-correct">
       <CheckCircle className="h-3 w-3" />
       {networkName}
     </Badge>

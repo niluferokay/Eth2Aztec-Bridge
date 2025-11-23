@@ -104,13 +104,18 @@ export default function Home() {
   const isCorrectNetwork = chainId === EXPECTED_CHAIN_ID;
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
+      <header className="border-b bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold">tUSDC Faucet</h2>
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <span className="text-white font-bold text-sm">tU</span>
+            </div>
+            <h2 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Testnet USDC Faucet
+            </h2>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <NetworkBadge
               chainId={chainId}
               expectedChainId={EXPECTED_CHAIN_ID}
@@ -126,36 +131,47 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-12 md:py-16">
-        <div className="max-w-2xl mx-auto space-y-6">
-          <FaucetCard
-            walletAddress={walletAddress}
-            isCorrectNetwork={isCorrectNetwork}
-            isRateLimited={isRateLimited}
-            onRequestTokens={handleRequestTokens}
-            isLoading={txStatus === "pending"}
-          />
+      <div className="container mx-auto px-4 py-6">
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Faucet Section - Sidebar */}
+          <div className="lg:col-span-1 space-y-4">
+            <FaucetCard
+              walletAddress={walletAddress}
+              isCorrectNetwork={isCorrectNetwork}
+              isRateLimited={isRateLimited}
+              onRequestTokens={handleRequestTokens}
+              isLoading={txStatus === "pending"}
+            />
 
-          {isRateLimited && <RateLimitDisplay nextAvailableTime={nextAvailableTime} />}
+            {isRateLimited && <RateLimitDisplay nextAvailableTime={nextAvailableTime} />}
 
-          <TransactionStatus
-            status={txStatus}
-            txHash={txHash}
-            errorMessage={errorMessage}
-            explorerUrl={EXPLORER_URL}
-            onDismiss={() => setTxStatus("idle")}
-          />
+            <TransactionStatus
+              status={txStatus}
+              txHash={txHash}
+              errorMessage={errorMessage}
+              explorerUrl={EXPLORER_URL}
+              onDismiss={() => setTxStatus("idle")}
+            />
+          </div>
+
+          {/* Main Content - Bridge Iframe */}
+          <div className="lg:col-span-2">
+            <div className="rounded-xl overflow-hidden shadow-2xl border bg-white dark:bg-gray-950">
+              <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 p-3 text-white">
+                <h3 className="font-semibold text-center">Human Protocol Bridge</h3>
+              </div>
+              <iframe
+                src="https://bridge.human.tech/"
+                width="100%"
+                height="800px"
+                className="border-0"
+                title="Human Protocol Bridge"
+                data-testid="iframe-bridge"
+              />
+            </div>
+          </div>
         </div>
-      </main>
-
-      <footer className="border-t mt-16">
-        <div className="container mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
-          <p>Testnet USDC Faucet • Get 1000 tUSDC every 24 hours</p>
-          <p className="mt-2">
-            For development and testing purposes only
-          </p>
-        </div>
-      </footer>
+      </div>
     </div>
   );
 }
