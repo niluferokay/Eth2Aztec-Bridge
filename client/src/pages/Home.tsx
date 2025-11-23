@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ethers } from "ethers";
 import WalletButton from "@/components/WalletButton";
 import NetworkBadge from "@/components/NetworkBadge";
 import FaucetCard from "@/components/FaucetCard";
@@ -43,16 +44,16 @@ export default function Home() {
     }
   }, []);
 
-  // Check rate limit for address
+  // Check rate limit
   useEffect(() => {
     if (walletAddress) {
       const lastRequestKey = `faucet_last_request_${walletAddress.toLowerCase()}`;
       const lastRequest = localStorage.getItem(lastRequestKey);
-      
+
       if (lastRequest) {
         const lastRequestTime = new Date(lastRequest);
         const nextTime = new Date(lastRequestTime.getTime() + RATE_LIMIT_HOURS * 60 * 60 * 1000);
-        
+
         if (nextTime > new Date()) {
           setNextAvailableTime(nextTime);
         } else {
@@ -79,27 +80,41 @@ export default function Home() {
     setErrorMessage(undefined);
 
     try {
-      // TODO: Replace with actual contract interaction
-      // For now, this is a mock transaction for UI demonstration
-      // The transaction hash below is randomly generated and won't exist on Etherscan
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      if (!window.ethereum) {
+        throw new Error("MetaMask not found");
+      }
 
-      // Simulate success
-      const mockTxHash = "0x" + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join("");
-      setTxHash(mockTxHash);
-      setTxStatus("success");
-      
-      console.log("Mock transaction hash:", mockTxHash);
-      console.log("Explorer link:", `${EXPLORER_URL}/tx/${mockTxHash}`);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
 
-      // Set rate limit
-      const lastRequestKey = `faucet_last_request_${address.toLowerCase()}`;
-      localStorage.setItem(lastRequestKey, new Date().toISOString());
-      setNextAvailableTime(new Date(Date.now() + RATE_LIMIT_HOURS * 60 * 60 * 1000));
+      const faucet = new ethers.Contract(
+        "0x2cF83E27ff8AEfBb9e58aE328c5217fAf68a4BAE", // Faucet address
+        ["function requestTokens() external"],
+        signer
+      );
 
-    } catch (error: any) {
-      console.error("Error requesting tokens:", error);
-      setErrorMessage(error.message || "Failed to request tokens");
+      const tx = await faucet.requestTokens();
+      console.log("tx:", tx.hash);
+      setTxHash(tx.hash);
+      setTxStatus("pending");
+
+      const receipt = await tx.wait();
+
+      if (receipt.status === 1) {
+        setTxStatus("success");
+
+        const lastRequestKey = `faucet_last_request_${address.toLowerCase()}`;
+        localStorage.setItem(lastRequestKey, new Date().toISOString());
+        setNextAvailableTime(
+          new Date(Date.now() + RATE_LIMIT_HOURS * 60 * 60 * 1000)
+        );
+      } else {
+        throw new Error("Transaction reverted");
+      }
+
+    } catch (err: any) {
+      console.error("Error requesting tokens:", err);
+      setErrorMessage(err.message || "Failed to request tokens");
       setTxStatus("error");
     }
   };
@@ -112,11 +127,8 @@ export default function Home() {
       <header className="border-b bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">tU</span>
-            </div>
             <h2 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Testnet USDC Faucet
+              Eth2Aztec Bridge
             </h2>
           </div>
           <div className="flex items-center gap-2">
@@ -137,7 +149,7 @@ export default function Home() {
 
       <div className="container mx-auto px-4 py-6">
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Faucet Section - Sidebar */}
+          {/* Faucet Section */}
           <div className="lg:col-span-1 space-y-4">
             <FaucetCard
               walletAddress={walletAddress}
@@ -158,11 +170,11 @@ export default function Home() {
             />
           </div>
 
-          {/* Main Content - Bridge Iframe */}
+          {/* Bridge Section */}
           <div className="lg:col-span-2">
             <div className="rounded-xl overflow-hidden shadow-2xl border bg-white dark:bg-gray-950">
               <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 p-3 text-white">
-                <h3 className="font-semibold text-center">Human Protocol Bridge</h3>
+                <h3 className="font-semibold text-center">Human.tech x Aztec Bridge</h3>
               </div>
               <iframe
                 src="https://bridge.human.tech/"
